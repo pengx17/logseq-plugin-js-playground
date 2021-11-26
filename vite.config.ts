@@ -1,6 +1,5 @@
 import { defineConfig, Plugin, ResolvedConfig } from "vite";
 import reactPlugin from "@vitejs/plugin-react";
-import WindiCSS from "vite-plugin-windicss";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
@@ -39,7 +38,7 @@ const devIndexHtmlPlugin: () => Plugin = () => {
         </head>
         <body>
           <div id="app"></div>
-          <script type="module" src="/src/main.tsx"></script>
+          <script type="module" src="/src/main.ts"></script>
         </body>
       </html>
       `;
@@ -59,7 +58,7 @@ const devIndexHtmlPlugin: () => Plugin = () => {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [reactPlugin(), WindiCSS(), devIndexHtmlPlugin()],
+  plugins: [reactPlugin(), devIndexHtmlPlugin()],
   base: "",
   clearScreen: false,
   // Makes HMR available for development

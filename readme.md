@@ -1,17 +1,12 @@
-# Logseq Plugin Template React
+# Logseq J(T)S Playground Plugin
 
-## Features
+Usage:
+```
+{{renderer js_playground_render,block_id}}
+```
 
-- plug & play boilerplate
-- develop with HMR, empowered by lightning fast Vite ⚡
-- windicss for styling
-- pnpm
+### Technical
 
-### How HMR works?
-
-See vite.config.ts. There is a custom plugin that will write a dev only index.html.
-The index.html will
-
-- change its base to `http://${config.server.host}:${config.server.port}`
-- attach `/@vite/client` (allows error overlay and connect HMR ws)
-- register react-refresh preamble code
+- Why esbuild-wasm vs sucrase?
+  - show build errors
+  - define custom syntax (import contents from other blocks)
