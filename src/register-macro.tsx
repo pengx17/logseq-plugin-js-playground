@@ -19,7 +19,6 @@ export const registerMacro = () => {
       return;
     }
 
-    
     rendering.set(uuid, slot);
 
     const render = async () => {
@@ -29,11 +28,17 @@ export const registerMacro = () => {
         }
         const code = await loadCode(uuid);
         const result = await eval(code);
-        const template = ReactDOMServer.renderToStaticMarkup(result);
+        const template = ReactDOMServer.renderToStaticMarkup(
+          <div style={{ border: "2px solid #000", padding: "0 1em" }}>
+            {result}
+          </div>
+        );
 
         if (rendering.get(uuid) !== slot) {
           return;
         }
+
+        console.log("rendering " + template + ">" + uuid + " to " + slot);
 
         logseq.provideUI({
           key: "js-playground",
@@ -41,7 +46,8 @@ export const registerMacro = () => {
           reset: true,
           template: template,
         });
-      } catch {
+      } catch (err) {
+        console.error(err);
         // skip invalid
       }
       setTimeout(render, 1000);
