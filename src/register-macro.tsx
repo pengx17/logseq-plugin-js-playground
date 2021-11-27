@@ -1,8 +1,4 @@
-import React from "react";
-import ReactDOMServer from "react-dom/server";
-import { loadCode } from "./load-code";
-
-window.React = React;
+import { initEsbuild, loadAndEval } from "./load-eval";
 
 const macroPrefix = ":jsplay";
 
@@ -11,7 +7,12 @@ const css = (t, ...args) => String.raw(t, ...args);
 
 const rendering = new Map<string, string>();
 
+const wrapTemplate = (template: string) => {
+  return `<div style="border: 2px solid #000; padding: 0 1em; cursor: default">${template}</div>`;
+};
+
 export const registerMacro = () => {
+  initEsbuild();
   logseq.App.onMacroRendererSlotted(async ({ payload, slot }) => {
     const uuid = payload.uuid;
     const [type] = payload.arguments;
@@ -26,31 +27,30 @@ export const registerMacro = () => {
         if (rendering.get(uuid) !== slot) {
           return;
         }
-        const code = await loadCode(uuid);
-        const result = await eval(code);
-        const template = ReactDOMServer.renderToStaticMarkup(
-          <div style={{ border: "2px solid #000", padding: "0 1em" }}>
-            {result}
-          </div>
-        );
+        let template = await loadAndEval(uuid);
 
         if (rendering.get(uuid) !== slot) {
           return;
         }
 
-        console.log("rendering " + template + ">" + uuid + " to " + slot);
-
         logseq.provideUI({
           key: "js-playground",
           slot,
           reset: true,
-          template: template,
+          template: wrapTemplate(template),
         });
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
+        logseq.provideUI({
+          key: "js-playground",
+          slot,
+          reset: true,
+          template: wrapTemplate(
+            `<span style="color: red">${err.message}</span>`
+          ),
+        });
         // skip invalid
       }
-      setTimeout(render, 1000);
     };
     render();
   });
@@ -60,7 +60,17 @@ export const registerMacro = () => {
     const newContent = `{{renderer ${macroPrefix}}}`;
     const block = await logseq.Editor.getCurrentBlock();
     if (block) {
-      logseq.Editor.updateBlock(block.uuid, newContent);
+      await logseq.Editor.updateBlock(block.uuid, newContent);
+      const codeBlock = await logseq.Editor.insertBlock(
+        block.uuid,
+        `\`\`\`ts\n export default "Hello World!" \n\`\`\``
+      );
+      if (codeBlock) {
+        await logseq.Editor.moveBlock(codeBlock.uuid, block.uuid, {
+          children: true,
+        });
+        logseq.Editor.exitEditingMode();
+      }
     }
   });
 };
