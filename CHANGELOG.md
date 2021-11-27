@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/pengx17/logseq-js-playground-plugin/compare/v1.0.0...v1.0.1) (2021-11-27)
+
+
+### Bug Fixes
+
+* some issues ([0bee78c](https://github.com/pengx17/logseq-js-playground-plugin/commit/0bee78cec65a24a42e35a78143eaa31547ceaf8b))
+
 # 1.0.0 (2021-11-26)
 
 
